@@ -12,11 +12,17 @@
 
 </head>
 
-
 <div class="container-fluid mt-3" id="app">
-    <input type="text" class="form-control" v-model="criterioDeBusqueda" placeholder="Ingresar un criterio de busqueda...">
+    
+    <input type="text" class="form-control" v-model="criterioDeBusqueda" placeholder="Ingresar nombre o apellido...">
     <br>
-    <div class="card-deck m-0">
+    <input type="text" class="form-control" v-model="criterioDeBusquedaDni" placeholder="Ingrese dni...">
+    <br>
+    <h1 v-if= "!filtrosOk()" class="alert alert-warning" >
+        se requiere minimo 3 caracteres en los filtros
+    </h1>   
+    <br>
+         <div class="card-deck m-0">
         <div class="row">
             <div class="col" v-for="persona in personasFiltradas">
                 <div class="card mb-3">
@@ -30,6 +36,8 @@
         </div>
     </div>
 
+   
+
 </div>
 
 </html>
@@ -38,7 +46,7 @@
     new Vue({
         el: '#app',
         data: {
-            criterioDeBusqueda: '',
+            criterioDeBusqueda: '',     criterioDeBusquedaDni: '',
             //Aquí, en este array es donde tienen que agregar su información
             personas:
             [
@@ -50,21 +58,35 @@
                     { nombre: 'Gonzalo', apellido: 'Garcia Tunon', dni: 38708301, correo: 'garciatunong@gmail.com' },
                     { nombre: 'Eugenio', apellido: 'Sainte Marie', dni: 38707149, correo: 'eugenio.saintemarie@gmail.com' },
                     { nombre: 'Clara', apellido: 'Franzoni', dni: 36626020, correo: 'franzoniclara23@gmail.com' },
-                    { nombre: 'x', apellido: 'y', dni: 0, correo: 'x@y' },
+                    { nombre: 'x', apellido: 'y', dni: 0, correo: 'x@y' }
               
                 ]
         },
         computed: {
             personasFiltradas() {
                 return this.personas.filter((persona) => {
-                    let registroCompleto = `${persona.nombre}${persona.apellido}${persona.dni}${persona.correo}`
-                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
+                    let registroCompleto = `${persona.nombre}${persona.apellido}`
+                    let registroDni = `${persona.dni}`
+                    return this.filtrosOk() &&  registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase()) &&
+                     registroDni.toLowerCase().includes(this.criterioDeBusquedaDni.toLowerCase())
                 });
             }
         },
         methods: {
             getNombreCompleto(persona) {
                 return `${persona.nombre} ${persona.apellido}`
+            },
+
+            filtroNombre(){
+                return this.criterioDeBusqueda.length >= 3 || this.criterioDeBusqueda.length == 0
+            },
+
+            filtroDni(){
+                return this.criterioDeBusquedaDni.length >= 3 || this.criterioDeBusquedaDni.length == 0
+            },
+
+            filtrosOk(){
+                return this.filtroNombre () && this.filtroDni()
             }
         }
     });
